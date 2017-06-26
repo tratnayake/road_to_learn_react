@@ -1,4 +1,3 @@
-//Starting page 31
 import React, { Component } from 'react';
 import './App.css';
 
@@ -21,23 +20,43 @@ const list = [
   }
 ]
 
+//App extends from the Component class of React
 class App extends Component {
 
+  //Set up the props
   constructor(props){
+    //User Super to get the props from the parent class because this is extending
+    //extending parent class.
     super(props);
-
+    //THe state is going to have the list defined above.
     this.state = {
       list: list,
-    }
+    };
+
+    this.onDimiss = this.onDismiss.bind(this);
   }
 
+  onDismiss(id) {
+    // //Check if the item is id, and return if not true.
+    // function isNotId(item) {
+    //   return item.objectId !== id;
+    // }
+    const isNotId = item => item.objectID !== id;
+
+    //How does a filter function work.
+    // For every item on the list check if it's not the id.
+    const updatedList = this.state.list.filter(isNotId);
+
+    this.setState({ list: updatedList})
+  }
+
+
   render() {
-    const helloWorld = 'Welcome to React'
-    const firstName = 'Thilina'
-    const lastName = "Ratnayake"
     return (
       <div className="App">
         {
+          //For reach item in the list
+            //ES6 function notation
           this.state.list.map(item =>
               <div key={item.objectID}>
                 <span>
@@ -46,6 +65,14 @@ class App extends Component {
                 <span>{item.author}</span>
                 <span>{item.num_comments}</span>
                 <span>{item.points}</span>
+                <span>
+                  <button
+                    onClick={() => this.onDismiss(item.objectID)}
+                    type="button"
+                  >
+                    Dismiss
+                  </button>
+                </span>
               </div>
             )}
       </div>
