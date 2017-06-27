@@ -20,6 +20,21 @@ const list = [
   }
 ]
 
+//ES5
+// function isSearched(searchTerm){
+//   return function(item){
+//     //some condition which returns true or false
+//     //return 0 OR item lower case position of actual search term lower case
+//     console.log(searchTerm)
+//     return !searchTerm || item.title.toLowerCase().includes(searchTerm.lowerCase());
+//   }
+// }
+
+//ES6
+const isSearched = (searchTerm) => (item) =>
+  !searchTerm || item.title.toLowerCase().includes(searchTerm.toLowerCase());
+
+
 //App extends from the Component class of React
 class App extends Component {
 
@@ -31,9 +46,16 @@ class App extends Component {
     //THe state is going to have the list defined above.
     this.state = {
       list: list,
+      searchTerm: '',
     };
 
+    this.onSearchChange = this.onSearchChange.bind(this);
     this.onDimiss = this.onDismiss.bind(this);
+
+  }
+
+  onSearchChange(event){
+    this.setState({ searchTerm: event.target.value})
   }
 
   onDismiss(id) {
@@ -51,30 +73,35 @@ class App extends Component {
   }
 
 
+
+
   render() {
+    const {searchTerm, list } = this.state;
     return (
       <div className="App">
-        {
+        <form>
+          <input type="text" onChange={this.onSearchChange} />
+          </form>
+        { list.filter(isSearched(searchTerm)).map(item =>
           //For reach item in the list
             //ES6 function notation
-          this.state.list.map(item =>
-              <div key={item.objectID}>
-                <span>
-                  <a href={item.url}>{item.title}</a>
-                </span>
-                <span>{item.author}</span>
-                <span>{item.num_comments}</span>
-                <span>{item.points}</span>
-                <span>
-                  <button
-                    onClick={() => this.onDismiss(item.objectID)}
-                    type="button"
-                  >
-                    Dismiss
-                  </button>
-                </span>
-              </div>
-            )}
+          <div key={item.objectID}>
+            <span>
+              <a href={item.url}>{item.title}</a>
+            </span>
+            <span>{item.author}</span>
+            <span>{item.num_comments}</span>
+            <span>{item.points}</span>
+            <span>
+              <button
+                onClick={() => this.onDismiss(item.objectID)}
+                type="button"
+              >
+                Dismiss
+              </button>
+            </span>
+          </div>
+        )}
       </div>
     );
   }
