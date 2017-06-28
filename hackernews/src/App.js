@@ -31,8 +31,11 @@ const list = [
 // }
 
 //ES6
+//A function which takes in searchTerm and returns another function
+// which takes in an item and either returns either 0 OR the index
 const isSearched = (searchTerm) => (item) =>
   !searchTerm || item.title.toLowerCase().includes(searchTerm.toLowerCase());
+  //!searchTerm = 0 OR 3 (i.e. whatever the corresponding element is)
 
 
 //App extends from the Component class of React
@@ -49,6 +52,7 @@ class App extends Component {
       searchTerm: '',
     };
 
+    //Bind is used to make it a class method.
     this.onSearchChange = this.onSearchChange.bind(this);
     this.onDimiss = this.onDismiss.bind(this);
 
@@ -72,20 +76,54 @@ class App extends Component {
     this.setState({ list: updatedList})
   }
 
-
-
-
   render() {
     const {searchTerm, list } = this.state;
     return (
       <div className="App">
-        <form>
-          <input type="text" onChange={this.onSearchChange} />
-          </form>
-        { list.filter(isSearched(searchTerm)).map(item =>
-          //For reach item in the list
-            //ES6 function notation
-          <div key={item.objectID}>
+        <Search value={searchTerm} onChange={this.onSearchChange}>
+          Search
+        </Search>
+        <Table list={list} pattern={searchTerm} onDismiss={this.onDismiss} />
+      </div>
+    );
+  }
+}
+
+// class Search extends Component {
+//   render(){
+//     const {value, onChange, children } = this.props;
+//     return (
+//       <form>
+//         {children}
+//         <input
+//           type="text"
+//           value={value}
+//           onChange={onChange}
+//         />
+//       </form>
+//     );
+//   }
+// }
+//Refactored to be Functional Stateless
+const Search = ({ value, onChange, children }) =>
+  <form>
+    {children}
+    <input
+      type="text"
+      value={value}
+      onChange={onChange}
+    />
+  </form>
+
+class Table extends Component {
+  //First method should be a render
+  render(){
+    //Set up scope variables here.
+    const { list, pattern, onDismiss } = this.props;
+    return (
+      <div>
+        { list.filter(isSearched(pattern)).map(item =>
+          <div key={item.objectId}>
             <span>
               <a href={item.url}>{item.title}</a>
             </span>
@@ -93,18 +131,37 @@ class App extends Component {
             <span>{item.num_comments}</span>
             <span>{item.points}</span>
             <span>
-              <button
-                onClick={() => this.onDismiss(item.objectID)}
-                type="button"
-              >
+              <Button onClick={() => onDismiss(item.objectID)}>
                 Dismiss
-              </button>
+              </Button>
             </span>
           </div>
         )}
       </div>
     );
   }
+}
+
+class Button extends Component {
+  render() {
+    const {
+      onClick,
+      className ='',
+      children,
+    } = this.props;
+
+    return (
+      <button
+        onClick={onClick}
+        className={className}
+        type="button"
+      >
+      {children}
+      </button>
+    )
+  }
+
+
 }
 
 export default App;
