@@ -1,24 +1,15 @@
 import React, { Component } from 'react';
 import './App.css';
 
-const list = [
-  {
-    title: 'React',
-    url: 'https://facebook.github.io/react/',
-    author: 'Jordan Walke',
-    num_comments: 3,
-    points: 4,
-    objectID: 0
-  },
-  {
-    title: 'Redux',
-    url: 'https://github.com/reactjs/redux',
-    author: 'Dan Abramov, Andrew Clark',
-    num_comments: 2,
-    points: 5,
-    objectID: 1
-  }
-]
+//API details
+const DEFAULT_QUERY = 'redux'
+
+const PATH_BASE = 'https://hn.algolia.com/api/v1'
+const PATH_SEARCH = '/search';
+const PARAM_SEARCH = 'query=';
+
+const url = `${PATH_BASE}${PATH_SEARCH}?${PARAM_SEARCH}${DEFAULT_QUERY}`;
+
 
 
 
@@ -39,14 +30,33 @@ class App extends Component {
     super(props);
     //THe state is going to have the list defined above.
     this.state = {
-      list: list,
+      result: null,
       searchTerm: '',
     };
 
     //Bind is used to make it a class method.
+    this.setSearchTopstories = this.setSearchTopstories.bind(this);
+    this.fetchSearchTopstories = this.fetchSearchTopstories.bind(this);
     this.onSearchChange = this.onSearchChange.bind(this);
     this.onDismiss = this.onDismiss.bind(this);
 
+  }
+
+  setSearchTopstories(result) {
+    console.log(result);
+    this.setState({ result })
+  }
+
+  fetchSearchTopstories(searchTerm) {
+    fetch(url)
+    .then(response => response.json())
+    .then(result => this.setSearchTopstories(result));
+  }
+
+  //As soon as this component ismounted, fetch from API
+  componentDidMount(){
+    const { searchTerm } = this.state;
+    this.fetchSearchTopstories(searchTerm);
   }
 
   onSearchChange(event){
@@ -58,17 +68,28 @@ class App extends Component {
     // function isNotId(item) {
     //   return item.objectId !== id;
     // }
+
+    //Return anything that's NOT the dismissed ID
     const isNotId = item => item.objectID !== id;
 
-    //How does a filter function work.
-    // For every item on the list check if it's not the id.
-    const updatedList = list.filter(isNotId);
+    const updatedHits = this.state.result.hits.filter(isNotId);
+    this.setState({
+      //Take the existing result object, into hits element, put the updatedHits
+      result: { ...this.state.result, hits: updatedHits }
+    })
 
-    this.setState({ list: updatedList})
+    // //How does a filter function work.
+    // // For every item on the list check if it's not the id.
+    // const updatedList = list.filter(isNotId);
+    //
+    // this.setState({ list: updatedList})
   }
 
   render() {
-    const {searchTerm, list } = this.state;
+    const {searchTerm, result } = this.state;
+
+    if (!result) {return null; }
+
     return (
       <div className="page">
         <div className="interactions">
@@ -76,7 +97,13 @@ class App extends Component {
             Search
           </Search>
         </div>
-          <Table list={list} pattern={searchTerm} onDismiss={this.onDismiss} />
+        { result && <Table
+            list={result.hits}
+            pattern={searchTerm}
+            onDismiss={this.onDismiss}
+          />
+        }
+
       </div>
     );
   }
