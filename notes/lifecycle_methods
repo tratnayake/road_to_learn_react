@@ -1,0 +1,36 @@
+New Components has 4 lifecycle methods:
+
+constructor()
+componentWillMount()
+render()
+componentDidMount()
+
+Updating has 5:
+
+componentWillReceiveProps()
+shouldComponentUpdate()
+componentWillUpdate()
+render()
+componentDidUpdate()
+
+constructor(props) - called when a component is initialized.
+-- Set initial state and bind useful methods here
+
+componentWillMount() - Called before render. Could be used to set internal component state.
+
+render() -- returns elements as output of component (Don't modify state in here)
+
+componentDidMount() - Called only once when the comp is mounted.
+** -- This is a good time to fetch data form API. This data gets stored in internal state.
+
+componentWIllReceiveProps(nextProps) - Called during an update.
+
+shouldComponentUpdate(nextProps, nextState) -- Called when the component updates due ot state or props changes
+-- Used for perf optimizations
+
+componentWillUpdate(nextProp,nextState) -- Immediately invoked before render() method.
+-- You can't use setState() from in here, use this for final prep of data
+
+componentDidUpdate(prevProps, prevState) - Called immediately after render. Use this as opp to change DOM or fetch more
+
+componentWillUnmount() - Called before destroying component. 
